@@ -20,7 +20,7 @@
   function resizeButton() {
     var button = document.getElementById('resizeButton');
     var currentSize = parseFloat(window.getComputedStyle(button, null).getPropertyValue('font-size'));
-    var newSize = currentSize + 5;
+    var newSize = currentSize + 0.1;
     button.style.fontSize = newSize + 'px';
   }
 </script>
