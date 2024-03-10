@@ -14,14 +14,33 @@
     left: 50%;
     transform: translate(-50%, -50%);
   }
+
+  #secretButton {
+    position: fixed;
+    top: 65%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    padding: 10px 20px;
+  }
 </style>
 </head>
 <body>
 
 <button id="incrementButton" onmousedown="buttonClick()" onmouseup="buttonRelease()">0</button>
+<button id="secretButton" onclick="openSnakeGame()">Secret</button>
 
 <script>
   let count = 0;
+
+  function getRandomColor() {
+    let letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
 
   function incrementNumber() {
     count++;
@@ -31,12 +50,18 @@
   function buttonClick() {
     let button = document.getElementById('incrementButton');
     button.style.transform = 'translate(-50%, -50%) scale(1.1)';
+    button.style.backgroundColor = getRandomColor();
     incrementNumber();
   }
 
   function buttonRelease() {
     let button = document.getElementById('incrementButton');
     button.style.transform = 'translate(-50%, -50%) scale(1)';
+  }
+
+  function openSnakeGame() {
+    // Open your snake game here
+    window.open('snake_game.html', '_blank');
   }
 </script>
 
