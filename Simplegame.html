@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Einfaches Spiel</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        #gameArea {
+            width: 800px;
+            height: 600px;
+            background-color: #ddd;
+            position: relative;
+        }
+        #player {
+            width: 50px;
+            height: 50px;
+            background-color: #ff0000;
+            position: absolute;
+            top: 275px; /* Center vertically in 600px */
+            left: 375px; /* Center horizontally in 800px */
+        }
+    </style>
+</head>
+<body>
+    <div id="gameArea">
+        <div id="player"></div>
+    </div>
+    <script>
+        const player = document.getElementById('player');
+        const gameArea = document.getElementById('gameArea');
+
+        let playerX = 375; // Starting position X
+        let playerY = 275; // Starting position Y
+        const playerSpeed = 10; // Speed of the player
+
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'w':
+                    playerY = Math.max(0, playerY - playerSpeed);
+                    break;
+                case 'ArrowDown':
+                case 's':
+                    playerY = Math.min(gameArea.clientHeight - player.clientHeight, playerY + playerSpeed);
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                    playerX = Math.max(0, playerX - playerSpeed);
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                    playerX = Math.min(gameArea.clientWidth - player.clientWidth, playerX + playerSpeed);
+                    break;
+            }
+            player.style.top = playerY + 'px';
+            player.style.left = playerX + 'px';
+        });
+    </script>
+</body>
+</html>
