@@ -89,7 +89,8 @@
         });
 
         gameArea.addEventListener('click', (e) => {
-            shootProjectile(e.clientX, e.clientY);
+            const rect = gameArea.getBoundingClientRect();
+            shootProjectile(e.clientX - rect.left, e.clientY - rect.top);
         });
 
         function shootProjectile(targetX, targetY) {
