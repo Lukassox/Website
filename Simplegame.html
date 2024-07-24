@@ -28,19 +28,42 @@
             top: 275px; /* Center vertically in 600px */
             left: 375px; /* Center horizontally in 800px */
         }
+        .projectile {
+            width: 10px;
+            height: 10px;
+            background-color: #0000ff;
+            position: absolute;
+            border-radius: 50%;
+        }
+        .zombie {
+            width: 40px;
+            height: 40px;
+            background-color: #00ff00;
+            position: absolute;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        }
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+        }
     </style>
 </head>
 <body>
     <div id="gameArea">
         <div id="player"></div>
+        <div id="score">Score: 0</div>
     </div>
     <script>
         const player = document.getElementById('player');
         const gameArea = document.getElementById('gameArea');
+        const scoreDisplay = document.getElementById('score');
 
-        let playerX = 375; // Starting position X
-        let playerY = 275; // Starting position Y
-        const playerSpeed = 10; // Speed of the player
+        let playerX = 375;
+        let playerY = 275;
+        const playerSpeed = 10;
+        let score = 0;
 
         document.addEventListener('keydown', (e) => {
             switch(e.key) {
@@ -64,6 +87,102 @@
             player.style.top = playerY + 'px';
             player.style.left = playerX + 'px';
         });
+
+        gameArea.addEventListener('click', (e) => {
+            shootProjectile(e.clientX, e.clientY);
+        });
+
+        function shootProjectile(targetX, targetY) {
+            const projectile = document.createElement('div');
+            projectile.classList.add('projectile');
+            projectile.style.left = playerX + 20 + 'px'; // Offset to center the projectile
+            projectile.style.top = playerY + 20 + 'px'; // Offset to center the projectile
+            gameArea.appendChild(projectile);
+
+            const angle = Math.atan2(targetY - (playerY + 25), targetX - (playerX + 25));
+            const speed = 5;
+            const velocityX = Math.cos(angle) * speed;
+            const velocityY = Math.sin(angle) * speed;
+
+            function moveProjectile() {
+                const projX = parseInt(projectile.style.left);
+                const projY = parseInt(projectile.style.top);
+                projectile.style.left = projX + velocityX + 'px';
+                projectile.style.top = projY + velocityY + 'px';
+
+                // Check for collisions with zombies
+                document.querySelectorAll('.zombie').forEach(zombie => {
+                    if (isCollision(projectile, zombie)) {
+                        zombie.remove();
+                        projectile.remove();
+                        score++;
+                        scoreDisplay.textContent = 'Score: ' + score;
+                    }
+                });
+
+                if (projX > gameArea.clientWidth || projX < 0 || projY > gameArea.clientHeight || projY < 0) {
+                    projectile.remove();
+                } else {
+                    requestAnimationFrame(moveProjectile);
+                }
+            }
+            moveProjectile();
+        }
+
+        function isCollision(proj, zom) {
+            const projRect = proj.getBoundingClientRect();
+            const zomRect = zom.getBoundingClientRect();
+            return !(projRect.right < zomRect.left || 
+                     projRect.left > zomRect.right || 
+                     projRect.bottom < zomRect.top || 
+                     projRect.top > zomRect.bottom);
+        }
+
+        function spawnZombie() {
+            const zombie = document.createElement('div');
+            zombie.classList.add('zombie');
+            const side = Math.floor(Math.random() * 4);
+            switch(side) {
+                case 0: // Top
+                    zombie.style.top = '0px';
+                    zombie.style.left = Math.random() * gameArea.clientWidth + 'px';
+                    break;
+                case 1: // Bottom
+                    zombie.style.top = gameArea.clientHeight - 40 + 'px';
+                    zombie.style.left = Math.random() * gameArea.clientWidth + 'px';
+                    break;
+                case 2: // Left
+                    zombie.style.left = '0px';
+                    zombie.style.top = Math.random() * gameArea.clientHeight + 'px';
+                    break;
+                case 3: // Right
+                    zombie.style.left = gameArea.clientWidth - 40 + 'px';
+                    zombie.style.top = Math.random() * gameArea.clientHeight + 'px';
+                    break;
+            }
+            gameArea.appendChild(zombie);
+
+            function moveZombie() {
+                const zomX = parseInt(zombie.style.left);
+                const zomY = parseInt(zombie.style.top);
+                const angle = Math.atan2(playerY + 25 - zomY, playerX + 25 - zomX);
+                const speed = 1;
+                const velocityX = Math.cos(angle) * speed;
+                const velocityY = Math.sin(angle) * speed;
+                zombie.style.left = zomX + velocityX + 'px';
+                zombie.style.top = zomY + velocityY + 'px';
+
+                if (isCollision(zombie, player)) {
+                    alert('Game Over! Final Score: ' + score);
+                    window.location.reload();
+                } else {
+                    requestAnimationFrame(moveZombie);
+                }
+            }
+            moveZombie();
+        }
+
+        setInterval(spawnZombie, 2000);
     </script>
 </body>
 </html>
